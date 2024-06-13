@@ -1,4 +1,4 @@
-import Job from "../models/jobModel";
+import Job from "../models/jobModel.js";
 
 //create Job
 
@@ -10,9 +10,23 @@ const createJob = async (req, res) => {
       });
     }
 
-    const { title, company, location, description, postedDate, postedBy } =
-      req.body;
-    if (!title || !company || !location || !description || !postedBy) {
+    const {
+      title,
+      category,
+      company,
+      location,
+      description,
+      postedDate,
+      postedBy,
+    } = req.body;
+    if (
+      !title ||
+      !postedBy ||
+      !category ||
+      !company ||
+      !location ||
+      !description
+    ) {
       return res.status(400).json({
         success: false,
         message: "Required Fields Needed",
@@ -24,8 +38,10 @@ const createJob = async (req, res) => {
       location,
       description,
       postedDate,
-      postedBy: req.user._id,
+      category,
+      postedBy,
     });
+    console.log("job:", job);
     res.status(201).json({
       success: true,
       message: "Job successfully Created",
@@ -102,7 +118,7 @@ const updateJob = async (req, res) => {
 };
 
 //delete a job
-const deteteJob = async (req, res) => {
+const deleteJob = async (req, res) => {
   try {
     if (!req.permission.job.create) {
       return res.status(401).json({
@@ -125,4 +141,4 @@ const deteteJob = async (req, res) => {
   }
 };
 
-export { createJob, getAllJobs, getOneJob, updateJob, deteteJob };
+export { createJob, getAllJobs, getOneJob, updateJob, deleteJob };

@@ -1,4 +1,3 @@
-import express from "express";
 import mongoose from "mongoose";
 
 const jobSchema = mongoose.Schema({
@@ -10,11 +9,11 @@ const jobSchema = mongoose.Schema({
   company: { type: String, required: true, trim: true },
   location: { type: String, required: true, trim: true },
   description: { type: String, required: true, trim: true },
+  category: { type: String, required: true, trim: true },
   postedDate: { type: Date, default: Date.now },
   postedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
   },
 });
 

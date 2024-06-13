@@ -36,29 +36,40 @@ const userSchema = mongoose.Schema(
       type: String,
       enum: ["Male", "Female"],
     },
+
+    role: {
+      type: String,
+      enum: ["Admin", "JobScouter"],
+      default: "JobScouter",
+    },
+
     permissions: {
       job: {
         create: {
           type: Boolean,
-          default: true,
+          default: false,
         },
         read: {
           type: Boolean,
           deafult: true,
         },
         update: {
-          ype: Boolean,
-          deafult: true,
+          type: Boolean,
+          deafult: false,
         },
         remove: {
-          ype: Boolean,
+          type: Boolean,
           deafult: false,
         },
       },
     },
     profile: {
-      bio: String,
-      contactNumber: String,
+      bio: {
+        type: String,
+      },
+      contactNumber: {
+        type: String,
+      },
     },
   },
   {

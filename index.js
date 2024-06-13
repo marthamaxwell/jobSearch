@@ -1,13 +1,27 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import helmet from "helmet";
+import cors from "cors";
+import expressSanitizer from "express-sanitizer";
+
+import userRouter from "./src/routes/userRoutes.js";
+import jobsRouter from "./src/routes/jobsRoutes.js";
 
 dotenv.config();
-
 const app = express();
 
 const myPort = process.env.PORT;
 const dataBase = process.env.DATABASE;
+
+//middleware
+app.use(express.json());
+app.use(expressSanitizer());
+app.use(helmet());
+app.use(cors());
+
+app.use("/jobs", jobsRouter);
+app.use("/user", userRouter);
 
 app.get("/", (req, res) => {
   res.send("hey puting more effort here");
