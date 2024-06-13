@@ -40,7 +40,7 @@ const createJob = async (req, res) => {
   }
 };
 
-//Read all job
+//Read all jobs
 const getAllJobs = async (req, res) => {
   try {
     const allJobs = await Job.find();
@@ -52,7 +52,7 @@ const getAllJobs = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "not found",
+      message: "Job not found found",
       error: error.message,
     });
   }
@@ -60,11 +60,69 @@ const getAllJobs = async (req, res) => {
 
 //Read a single job
 const getOneJob = async (req, res) => {
-  const { id } = req.parms;
-  const singleJob = await Job.findOneById;
+  try {
+    const { id } = req.parms;
+    const singleJob = await Job.findById(id);
+    res.status(201).json({
+      success: true,
+      message: "Job found",
+      data: singleJob,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Job not found found",
+      error: error.message,
+    });
+  }
 };
 
 //update a job
-//delete a job
+const updateJob = async (req, res) => {
+  try {
+    if (!req.permission.job.create) {
+      return res.status(401).json({
+        message: "You're not allowed to create jobs",
+      });
+    }
+    const { id } = req.params;
+    const job = await Job.findByIdAndUpdate(id);
+    res.status(200).json({
+      success: true,
+      message: "job updated succefully",
+      data: job,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Job not uppdated ",
+      error: error.message,
+    });
+  }
+};
 
-export { createJob, getAllJobs, getOneJob };
+//delete a job
+const deteteJob = async (req, res) => {
+  try {
+    if (!req.permission.job.create) {
+      return res.status(401).json({
+        message: "You're not allowed to create jobs",
+      });
+    }
+    const { id } = req.params;
+    const deletedJob = await Job.findByIdAndDelete(id);
+    res.status(200).json({
+      success: true,
+      message: "job deleted succefully",
+      data: deletedJob,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Job not deleted",
+      error: error.message,
+    });
+  }
+};
+
+export { createJob, getAllJobs, getOneJob, updateJob, deteteJob };
