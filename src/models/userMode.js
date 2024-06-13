@@ -31,11 +31,6 @@ const userSchema = mongoose.Schema(
         }
       },
     },
-    role: {
-      type: String,
-      enum: ["admin", "employer", "jobScouter"],
-      default: "jobScouter",
-    },
 
     gender: {
       type: String,
