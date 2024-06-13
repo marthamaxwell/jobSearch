@@ -39,9 +39,12 @@ const createJob = async (req, res) => {
       description,
       postedDate,
       category,
-      postedBy,
+      postedBy: req.user_id,
     });
-    console.log("job:", job);
+    await book.populate({
+      path: "user",
+      select: "fullname",
+    });
     res.status(201).json({
       success: true,
       message: "Job successfully Created",
@@ -59,7 +62,10 @@ const createJob = async (req, res) => {
 //Read all jobs
 const getAllJobs = async (req, res) => {
   try {
-    const allJobs = await Job.find();
+    const allJobs = await Job.find().populate({
+      path: "user",
+      select: "fullname",
+    });
     res.status(201).json({
       success: true,
       message: "Jobs found",
@@ -78,7 +84,10 @@ const getAllJobs = async (req, res) => {
 const getOneJob = async (req, res) => {
   try {
     const { id } = req.parms;
-    const singleJob = await Job.findById(id);
+    const singleJob = await Job.findById(id).populate({
+      path: "user",
+      select: "fullname",
+    });
     res.status(201).json({
       success: true,
       message: "Job found",
@@ -102,7 +111,10 @@ const updateJob = async (req, res) => {
       });
     }
     const { id } = req.params;
-    const job = await Job.findByIdAndUpdate(id);
+    const job = await Job.findByIdAndUpdate(id).populate({
+      path: "user",
+      select: "fullname",
+    });
     res.status(200).json({
       success: true,
       message: "job updated succefully",

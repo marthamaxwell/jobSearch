@@ -71,6 +71,19 @@ const userSchema = mongoose.Schema(
         type: String,
       },
     },
+    auth: {
+      token: {
+        type: String,
+      },
+      otp: {
+        code: {
+          type: String,
+        },
+        expires_in: {
+          type: Date,
+        },
+      },
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
