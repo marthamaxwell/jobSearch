@@ -4,11 +4,11 @@ import Job from "../models/jobModel.js";
 
 const createJob = async (req, res) => {
   try {
-    if (!req.permission.job.create) {
-      return res.status(401).json({
-        message: "You're not allowed to create jobs",
-      });
-    }
+    // if (!req.permission.job.create) {
+    //   return res.status(401).json({
+    //     message: "You're not allowed to create jobs",
+    //   });
+    // }
 
     const {
       title,
@@ -17,16 +17,9 @@ const createJob = async (req, res) => {
       location,
       description,
       postedDate,
-      postedBy,
+      user,
     } = req.body;
-    if (
-      !title ||
-      !postedBy ||
-      !category ||
-      !company ||
-      !location ||
-      !description
-    ) {
+    if (!title || !category || !company || !location || !description) {
       return res.status(400).json({
         success: false,
         message: "Required Fields Needed",
@@ -39,12 +32,9 @@ const createJob = async (req, res) => {
       description,
       postedDate,
       category,
-      postedBy: req.user_id,
+      user: req.user_id,
     });
-    await book.populate({
-      path: "user",
-      select: "fullname",
-    });
+    await job.populate("user", "fullName");
     res.status(201).json({
       success: true,
       message: "Job successfully Created",
@@ -63,8 +53,8 @@ const createJob = async (req, res) => {
 const getAllJobs = async (req, res) => {
   try {
     const allJobs = await Job.find().populate({
-      path: "user",
-      select: "fullname",
+      path: "User",
+      select: "fullName",
     });
     res.status(201).json({
       success: true,
@@ -85,8 +75,8 @@ const getOneJob = async (req, res) => {
   try {
     const { id } = req.parms;
     const singleJob = await Job.findById(id).populate({
-      path: "user",
-      select: "fullname",
+      path: "User",
+      select: "fullName",
     });
     res.status(201).json({
       success: true,
@@ -113,7 +103,7 @@ const updateJob = async (req, res) => {
     const { id } = req.params;
     const job = await Job.findByIdAndUpdate(id).populate({
       path: "user",
-      select: "fullname",
+      select: "fullName",
     });
     res.status(200).json({
       success: true,

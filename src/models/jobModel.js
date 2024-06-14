@@ -12,8 +12,9 @@ const jobSchema = mongoose.Schema(
     description: { type: String, required: true, trim: true },
     category: { type: String, required: true, trim: true },
     postedDate: { type: Date, default: Date.now },
-    postedBy: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
+      required: true,
       ref: "User",
     },
   },

@@ -4,13 +4,14 @@ import User from "../models/userModel.js";
 const authenticate = async (req, res, next) => {
   try {
     const authorization = req.headers.authorization;
-    const [bearer, token] = authorization.split("");
-    if (bearer !== undefined && bearer !== "Bearer") {
+    console.log(authorization);
+    const [bearer, token] = authorization.split(" ");
+    if (bearer === undefined && bearer !== "Bearer") {
       return res.status(401).json({
         message: "Malformed header",
       });
     }
-    if (token !== undefined && token !== " ") {
+    if (token === undefined && token === " ") {
       return res.status(401).json({
         message: "Token required to access this route",
       });

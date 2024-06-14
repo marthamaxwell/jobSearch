@@ -6,10 +6,11 @@ import {
   getOneJob,
   updateJob,
 } from "../controllers/jobControllers.js";
+import authenticate from "../middleware/authentication.js";
 
 const jobsRouter = express.Router();
 
-jobsRouter.post("/create", createJob);
+jobsRouter.post("/create", authenticate, createJob);
 jobsRouter.get("/getAllJobs", getAllJobs);
 jobsRouter.get("/:id", getOneJob);
 jobsRouter.put("/update/:id", updateJob);
