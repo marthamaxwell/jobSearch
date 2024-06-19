@@ -1,4 +1,5 @@
 import express from "express";
+
 import {
   createJob,
   deleteJob,
@@ -10,10 +11,11 @@ import authenticate from "../middleware/authentication.js";
 
 const jobsRouter = express.Router();
 
-jobsRouter.post("/create", authenticate, createJob);
-jobsRouter.get("/getAllJobs", getAllJobs);
+jobsRouter.post("/", createJob);
+jobsRouter.get("/", getAllJobs);
 jobsRouter.get("/:id", getOneJob);
-jobsRouter.put("/update/:id", updateJob);
-jobsRouter.delete("/delete/:id", deleteJob);
+jobsRouter.patch("/:id", updateJob);
+
+jobsRouter.delete("/:id", deleteJob);
 
 export default jobsRouter;

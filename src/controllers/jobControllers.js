@@ -1,4 +1,5 @@
 import Job from "../models/jobModel.js";
+import User from "../models/userModel.js";
 
 //create Job
 
@@ -17,7 +18,7 @@ const createJob = async (req, res) => {
       location,
       description,
       postedDate,
-      user,
+      User,
     } = req.body;
     if (!title || !category || !company || !location || !description) {
       return res.status(400).json({
@@ -32,9 +33,8 @@ const createJob = async (req, res) => {
       description,
       postedDate,
       category,
-      user: req.user_id,
     });
-    await job.populate("user", "fullName");
+
     res.status(201).json({
       success: true,
       message: "Job successfully Created",
@@ -52,10 +52,7 @@ const createJob = async (req, res) => {
 //Read all jobs
 const getAllJobs = async (req, res) => {
   try {
-    const allJobs = await Job.find().populate({
-      path: "User",
-      select: "fullName",
-    });
+    const allJobs = await Job.find();
     res.status(201).json({
       success: true,
       message: "Jobs found",
@@ -95,16 +92,17 @@ const getOneJob = async (req, res) => {
 //update a job
 const updateJob = async (req, res) => {
   try {
-    if (!req.permission.job.create) {
-      return res.status(401).json({
-        message: "You're not allowed to create jobs",
-      });
-    }
+    // if (!req.permission.job.create) {
+    //   return res.status(401).json({
+    //     message: "You're not allowed to create jobs",
+    //   });
+    // }
     const { id } = req.params;
-    const job = await Job.findByIdAndUpdate(id).populate({
-      path: "user",
-      select: "fullName",
+    const job = await Job.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
     });
+    // const updatedJob = job.findByIdAndUpdate(id)
     res.status(200).json({
       success: true,
       message: "job updated succefully",
@@ -122,11 +120,11 @@ const updateJob = async (req, res) => {
 //delete a job
 const deleteJob = async (req, res) => {
   try {
-    if (!req.permission.job.create) {
-      return res.status(401).json({
-        message: "You're not allowed to create jobs",
-      });
-    }
+    // if (!req.permission.job.create) {
+    //   return res.status(401).json({
+    //     message: "You're not allowed to create jobs",
+    //   });
+    // }
     const { id } = req.params;
     const deletedJob = await Job.findByIdAndDelete(id);
     res.status(200).json({

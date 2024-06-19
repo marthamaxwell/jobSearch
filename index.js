@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import cors from "cors";
 import expressSanitizer from "express-sanitizer";
+import morgan from "morgan";
 
 import userRouter from "./src/routes/userRoutes.js";
 import jobsRouter from "./src/routes/jobsRoutes.js";
@@ -17,6 +18,7 @@ const dataBase = process.env.DATABASE;
 //middleware
 app.use(express.json());
 app.use(expressSanitizer());
+app.use(morgan("dev"));
 app.use(helmet());
 app.use(cors());
 
