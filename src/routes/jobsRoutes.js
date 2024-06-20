@@ -7,7 +7,6 @@ import {
   getOneJob,
   updateJob,
 } from "../controllers/jobControllers.js";
-import authenticate from "../middleware/authentication.js";
 
 const jobsRouter = express.Router();
 

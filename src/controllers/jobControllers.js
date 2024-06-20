@@ -52,11 +52,15 @@ const createJob = async (req, res) => {
 //Read all jobs
 const getAllJobs = async (req, res) => {
   try {
+    console.log("query:", req.query);
     const allJobs = await Job.find();
     res.status(201).json({
       success: true,
       message: "Jobs found",
-      data: allJobs,
+      result: allJobs.length,
+      data: {
+        allJobs: allJobs,
+      },
     });
   } catch (error) {
     res.status(500).json({
