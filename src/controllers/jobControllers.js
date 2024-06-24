@@ -76,6 +76,11 @@ const getAllJobs = async (req, res) => {
     const job = await query;
     console.log("QUERY:", req.query, "QUERY OBJECT:", queryObj);
 
+    //SORTING
+    if(req.query.sort){
+      
+    }
+
       //SEND RESPONSE
     res.status(201).json({
       success: true,
