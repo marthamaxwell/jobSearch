@@ -52,8 +52,12 @@ const createJob = async (req, res) => {
 //Read all jobs
 const getAllJobs = async (req, res) => {
   try {
-    console.log("query:", req.query);
-    const allJobs = await Job.find();
+    const queryObj = { ...req.query };
+    const excludedFields = ["page", "sort, limit", "fields"];
+    excludedFields.forEach((el) => delete queryObj[el]);
+    console.log("query:", req.query, "query obj:", queryObj);
+
+    const allJobs = await Job.find().where("title").equals("frontend dev");
     res.status(201).json({
       success: true,
       message: "Jobs found",
