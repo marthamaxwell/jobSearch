@@ -12,6 +12,7 @@ const jobSchema = mongoose.Schema(
     description: { type: String, required: true, trim: true },
     category: { type: String, required: true, trim: true },
     postedDate: { type: Date, default: Date.now },
+    salary: {type: Number, default: 0, required: true}
     // User: {
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: "User",

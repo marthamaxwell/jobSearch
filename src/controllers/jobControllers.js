@@ -19,6 +19,7 @@ const createJob = async (req, res) => {
       description,
       postedDate,
       User,
+      salary
     } = req.body;
     if (!title || !category || !company || !location || !description) {
       return res.status(400).json({
@@ -33,6 +34,7 @@ const createJob = async (req, res) => {
       description,
       postedDate,
       category,
+      salary
     });
 
     res.status(201).json({
@@ -49,21 +51,38 @@ const createJob = async (req, res) => {
   }
 };
 
-//Read all jobs
+//READ ALL JOBS
 const getAllJobs = async (req, res) => {
   try {
-    const queryObj = { ...req.query };
-    const excludedFields = ["page", "sort, limit", "fields"];
+    //BUILD QUERY
+    const queryObj = { ...req.query }; 
+    const excludedFields = ["page", "sort", "limit", "fields"];
     excludedFields.forEach((el) => delete queryObj[el]);
-    console.log("query:", req.query, "query obj:", queryObj);
+    // const allJobs = await Job.find(queryObj);
 
-    const allJobs = await Job.find().where("title").equals("frontend dev");
+    //USING THE FILTER OBJECT
+    // const allJobs = await Job.find({title: "sales consultant"});
+
+    //USING SPECIAL MONGOOSE METHODS
+    // const allJobs  = await Job.find().where("title").equals("sales consultant")
+
+    //ADVANCED FILTERING
+    let queryStr = JSON.stringify(queryObj)
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
+    console.log(JSON.parse( queryStr));
+
+    //EXECUTE QUERY
+    const query = await Job.find(JSON.parse(queryStr));
+    const job = await query;
+    console.log("QUERY:", req.query, "QUERY OBJECT:", queryObj);
+
+      //SEND RESPONSE
     res.status(201).json({
       success: true,
       message: "Jobs found",
-      result: allJobs.length,
+      result: job.length,
       data: {
-        allJobs: allJobs,
+        allJobs: job,
       },
     });
   } catch (error) {
