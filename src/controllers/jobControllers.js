@@ -1,8 +1,9 @@
 import Job from "../models/jobModel.js";
 import User from "../models/userModel.js";
 
-//create Job
 
+
+//create Job
 const createJob = async (req, res) => {
   try {
     // if (!req.permission.job.create) {
@@ -51,6 +52,8 @@ const createJob = async (req, res) => {
   }
 };
 
+
+
 //READ ALL JOBS
 const getAllJobs = async (req, res) => {
   try {
@@ -88,7 +91,23 @@ const getAllJobs = async (req, res) => {
      if(req.query.fields){
       const field = req.query.fields.split(",").join(" ");
       query= query.select(field)
+     }else{
+      query=query.select("-__v")
      }
+
+
+     //PAGINATION AND LIMIT
+     const page = req.query.page * 1 || 1;
+     const limit = req.query.limit * 1 || 100;
+     const skip = (page - 1) * limit
+     query = query.skip(skip).limit(limit)
+
+     if(req.query.page){
+      const numJobs = await Job.countDocuments();
+      if(skip >= numJobs) throw new Error("Page doesn't exists")
+     }
+   
+
 
     //EXECUTE QUERY
     const job = await query.exec();
@@ -187,4 +206,4 @@ const deleteJob = async (req, res) => {
   }
 };
 
-export { createJob, getAllJobs, getOneJob, updateJob, deleteJob };
+export { createJob, getAllJobs, getOneJob, updateJob, deleteJob};
