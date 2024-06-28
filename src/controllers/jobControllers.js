@@ -71,15 +71,23 @@ const getAllJobs = async (req, res) => {
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
     console.log(JSON.parse( queryStr));
 
-    //EXECUTE QUERY
-    const query = await Job.find(JSON.parse(queryStr));
-    const job = await query;
-    console.log("QUERY:", req.query, "QUERY OBJECT:", queryObj);
-
+    
+    //CREATE QUERY
+    let query = Job.find(JSON.parse(queryStr));
+   
     //SORTING
     if(req.query.sort){
-      
+      const sortBy = req.query.sort.split(",").join(" ")
+      console.log(sortBy);
+    query= query.sort(req.query.sort)
+    }else{
+      query = query.sort("-createdAt")
     }
+
+    //EXECUTE QUERY
+    const job = await query.exec();
+    console.log("QUERY:", req.query, "QUERY OBJECT:", queryObj);
+
 
       //SEND RESPONSE
     res.status(201).json({
@@ -93,7 +101,7 @@ const getAllJobs = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Job not found found",
+      message: "Job not found",
       error: error.message,
     });
   }
