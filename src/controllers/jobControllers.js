@@ -84,6 +84,12 @@ const getAllJobs = async (req, res) => {
       query = query.sort("-createdAt")
     }
 
+    //FIELD LIMITING
+     if(req.query.fields){
+      const field = req.query.fields.split(",").join(" ");
+      query= query.select(field)
+     }
+
     //EXECUTE QUERY
     const job = await query.exec();
     console.log("QUERY:", req.query, "QUERY OBJECT:", queryObj);
