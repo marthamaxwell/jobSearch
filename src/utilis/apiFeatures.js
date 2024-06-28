@@ -20,32 +20,32 @@ export class ApiFeatures {
     return this;
    }
 
-   sorting(){
+   sort(){
     if(this.queryString.sort){
         const sortBy = this.queryString.sort.split(",").join(" ")
         console.log(sortBy);
-      this.query= this.query.sort(req.query.sort)
+      this.query= this.query.sort(sortBy)
       }else{
         this.query = this.query.sort("-createdAt")
       }
        return this;
    }
   
-   limit(){
+   limitFields(){
     if(req.queryString.fields){
         const field = this.queryString.fields.split(",").join(" ");
         this.query=  this.query.select(field)
        }else{
-        query=query.select("-__v")
+        this.query= this.query.select("-__v")
        }
        return this;
    }
 
-   pagination(){
+   paginate(){
     const page = this.queryString.page * 1 || 1;
      const limit = this.queryString.limit * 1 || 100;
      const skip = (page - 1) * limit
-     query = query.skip(skip).limit(limit)
+     this.query =  this.query.skip(skip).limit(limit)
      return this;
    }
    
