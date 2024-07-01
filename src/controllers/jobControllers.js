@@ -161,19 +161,25 @@ const deleteJob = async (req, res) => {
   }
 };
 
-
+//Get Stats
 const getJobsStats = async (req, res) => {
   try {
     const stats = await Job.aggregate([
       {
-        $match: { salary: { $gte: 100 } }
+        $match: { salary: { $gte: 50 } }
       },
       {
         $group: {
-          _id: null,
+          _id: "$location",
+          numJobs:{$sum: 1},
           avgSalary: { $avg: "$salary" },
           minSalary: { $min: "$salary" },
           maxSalary: { $max: "$salary" }
+        },
+      },
+      {
+        $sort:{
+          avgSalary: -1
         }
       }
     ]);
@@ -188,7 +194,7 @@ const getJobsStats = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Job stats",
-      data: stats
+      data:{stats: stats}
     });
   } catch (error) {
     res.status(500).json({
@@ -197,6 +203,9 @@ const getJobsStats = async (req, res) => {
     });
   }
 };
+
+
+
 
 
 export { createJob, getAllJobs, getOneJob, updateJob, deleteJob, getJobsStats};
