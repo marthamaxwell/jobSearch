@@ -32,7 +32,7 @@ export class ApiFeatures {
    }
   
    limitFields(){
-    if(req.queryString.fields){
+    if(this.queryString.fields){
         const field = this.queryString.fields.split(",").join(" ");
         this.query=  this.query.select(field)
        }else{

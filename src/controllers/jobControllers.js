@@ -116,7 +116,7 @@ const getAllJobs = async (req, res) => {
     const features = new ApiFeatures(Job.find(), req.query)
 .filter().sort().limitFields().paginate()
     const job = await features.query.exec()
-    console.log("QUERY:", features.query, "QUERY OBJECT:", queryObj);
+    console.log("QUERY:", features.query);
     // console.log("QUERY:", req.query, "QUERY OBJECT:", queryObj);
 
 
