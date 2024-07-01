@@ -58,94 +58,43 @@ const createJob = async (req, res) => {
 //READ ALL JOBS
 const getAllJobs = async (req, res) => {
   try {
-    //BUILD QUERY
-    
-    // const allJobs = await Job.find(queryObj);
-
-    //USING THE FILTER OBJECT
-    // const allJobs = await Job.find({title: "sales consultant"});
-
-    //USING SPECIAL MONGOOSE METHODS
-    // const allJobs  = await Job.find().where("title").equals("sales consultant")
-
-    // const queryObj = { ...req.query }; 
-    // const excludedFields = ["page", "sort", "limit", "fields"];
-    // excludedFields.forEach((el) => delete queryObj[el]);
-
-    //ADVANCED FILTERING
-    // let queryStr = JSON.stringify(queryObj)
-    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
-    // console.log(JSON.parse( queryStr));
-
-    
-    //CREATE QUERY
-    // let query = Job.find(JSON.parse(queryStr));
-   
-    //SORTING
-    // if(req.query.sort){
-    //   const sortBy = req.query.sort.split(",").join(" ")
-    //   console.log(sortBy);
-    // query= query.sort(req.query.sort)
-    // }else{
-    //   query = query.sort("-createdAt")
-    // }
-
-    //FIELD LIMITING
-    //  if(req.query.fields){
-    //   const field = req.query.fields.split(",").join(" ");
-    //   query= query.select(field)
-    //  }else{
-    //   query=query.select("-__v")
-    //  }
-
-
-     //PAGINATION 
-    //  const page = req.query.page * 1 || 1;
-    //  const limit = req.query.limit * 1 || 100;
-    //  const skip = (page - 1) * limit
-    //  query = query.skip(skip).limit(limit)
-
-    //  if(req.query.page){
-    //   const numJobs = await Job.countDocuments();
-    //   if(skip >= numJobs) throw new Error("Page doesn't exists")
-    //  }
-   
-
-
-    //EXECUTE QUERY
+    // Create an instance of ApiFeatures to handle filtering, sorting, etc.
     const features = new ApiFeatures(Job.find(), req.query)
-.filter().sort().limitFields().paginate()
-    const job = await features.query.exec()
-    console.log("QUERY:", features.query);
-    // console.log("QUERY:", req.query, "QUERY OBJECT:", queryObj);
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
 
+    // Execute the query
+    const jobs = await features.query;
 
-      //SEND RESPONSE
-    res.status(201).json({
+    if (!jobs || jobs.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No jobs found",
+      });
+    }
+
+    res.status(200).json({
       success: true,
       message: "Jobs found",
-      result: job.length,
-      data: {
-        allJobs: job,
-      },
+      result: jobs.length,
+      data: jobs,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Job not found",
       error: error.message,
     });
   }
 };
 
+
 //Read a single job
 const getOneJob = async (req, res) => {
   try {
-    const { id } = req.parms;
-    const singleJob = await Job.findById(id).populate({
-      path: "User",
-      select: "fullName",
-    });
+    const { id } = req.params;
+    const singleJob = await Job.findById(id)
     res.status(201).json({
       success: true,
       message: "Job found",
@@ -154,7 +103,7 @@ const getOneJob = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Job not found found",
+      message: "Job not found",
       error: error.message,
     });
   }
@@ -212,4 +161,42 @@ const deleteJob = async (req, res) => {
   }
 };
 
-export { createJob, getAllJobs, getOneJob, updateJob, deleteJob};
+
+const getJobsStats = async (req, res) => {
+  try {
+    const stats = await Job.aggregate([
+      {
+        $match: { salary: { $gte: 100 } }
+      },
+      {
+        $group: {
+          _id: null,
+          avgSalary: { $avg: "$salary" },
+          minSalary: { $min: "$salary" },
+          maxSalary: { $max: "$salary" }
+        }
+      }
+    ]);
+
+    if (!stats || stats.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No matching job stats found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Job stats",
+      data: stats
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+
+export { createJob, getAllJobs, getOneJob, updateJob, deleteJob, getJobsStats};
