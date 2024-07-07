@@ -12,7 +12,7 @@ const jobSchema = mongoose.Schema(
     description: { type: String, required: true, trim: true },
     category: { type: String, required: true, trim: true },
     postedDate: { type: Date, default: Date.now },
-    salary: {type: Number, default: 0, required: true}
+    salary: { type: Number, default: 0, required: true },
     // User: {
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: "User",
@@ -25,6 +25,10 @@ const jobSchema = mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+jobSchema.virtual("annualSalary").get(function () {
+  return this.salary * 12;
+});
 
 const Job = mongoose.model("Job", jobSchema);
 export default Job;

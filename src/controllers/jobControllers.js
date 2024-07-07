@@ -199,6 +199,7 @@ const getJobsStats = async (req, res) => {
   }
 };
 
+//Get Monthly Job Statistics
 const getMonthlyJobs = async (req, res) => {
   const year = req.params.year * 1;
   try {
