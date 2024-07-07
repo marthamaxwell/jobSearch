@@ -2,8 +2,6 @@ import Job from "../models/jobModel.js";
 import User from "../models/userModel.js";
 import { ApiFeatures } from "../utilis/apiFeatures.js";
 
-
-
 //create Job
 const createJob = async (req, res) => {
   try {
@@ -21,7 +19,7 @@ const createJob = async (req, res) => {
       description,
       postedDate,
       User,
-      salary
+      salary,
     } = req.body;
     if (!title || !category || !company || !location || !description) {
       return res.status(400).json({
@@ -36,7 +34,7 @@ const createJob = async (req, res) => {
       description,
       postedDate,
       category,
-      salary
+      salary,
     });
 
     res.status(201).json({
@@ -52,8 +50,6 @@ const createJob = async (req, res) => {
     });
   }
 };
-
-
 
 //READ ALL JOBS
 const getAllJobs = async (req, res) => {
@@ -89,12 +85,11 @@ const getAllJobs = async (req, res) => {
   }
 };
 
-
 //Read a single job
 const getOneJob = async (req, res) => {
   try {
     const { id } = req.params;
-    const singleJob = await Job.findById(id)
+    const singleJob = await Job.findById(id);
     res.status(201).json({
       success: true,
       message: "Job found",
@@ -166,22 +161,22 @@ const getJobsStats = async (req, res) => {
   try {
     const stats = await Job.aggregate([
       {
-        $match: { salary: { $gte: 50 } }
+        $match: { salary: { $gte: 50 } },
       },
       {
         $group: {
-          _id: "$location",
-          numJobs:{$sum: 1},
+          _id: { $toUpper: "$postedDate" },
+          numJobs: { $sum: 1 },
           avgSalary: { $avg: "$salary" },
           minSalary: { $min: "$salary" },
-          maxSalary: { $max: "$salary" }
+          maxSalary: { $max: "$salary" },
         },
       },
       {
-        $sort:{
-          avgSalary: -1
-        }
-      }
+        $sort: {
+          avgSalary: 1,
+        },
+      },
     ]);
 
     if (!stats || stats.length === 0) {
@@ -194,7 +189,7 @@ const getJobsStats = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Job stats",
-      data:{stats: stats}
+      data: { stats: stats },
     });
   } catch (error) {
     res.status(500).json({
@@ -204,8 +199,66 @@ const getJobsStats = async (req, res) => {
   }
 };
 
+const getMonthlyJobs = async (req, res) => {
+  const year = req.params.year * 1;
+  try {
+    const monthlyJobs = await Job.aggregate([
+      {
+        $match: {
+          postedDate: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$postedDate" },
+          numJobs: { $sum: 1 },
+          jobs: { $push: "$title" },
+        },
+      },
 
+      {
+        $addFields: {
+          month: "$_id",
+        },
+      },
 
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+      {
+        $sort: {
+          numJobs: 1,
+        },
+      },
+      {
+        $limit: 2,
+      },
+    ]);
 
+    res.status(200).json({
+      success: true,
+      message: "Job stats",
+      data: { mjobs: monthlyJobs },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
 
-export { createJob, getAllJobs, getOneJob, updateJob, deleteJob, getJobsStats};
+export {
+  createJob,
+  getAllJobs,
+  getOneJob,
+  updateJob,
+  deleteJob,
+  getJobsStats,
+  getMonthlyJobs,
+};
