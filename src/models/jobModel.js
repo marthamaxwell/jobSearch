@@ -47,5 +47,22 @@ jobSchema.post("save", function (doc, next) {
   next();
 });
 
+//QUERY MIDDLEWARE
+jobSchema.pre(/^find/, function (next) {
+  this.find({ salary: { $gt: 400 } });
+  next();
+});
+
+jobSchema.post(/^find/, function (docs, next) {
+  console.log(docs);
+  next();
+});
+
+//AGGREGATION MIDDLEWARE
+jobSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ $match: { salary: { $gt: 400 } } });
+  next();
+});
+
 const Job = mongoose.model("Job", jobSchema);
 export default Job;

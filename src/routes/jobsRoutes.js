@@ -19,7 +19,7 @@ jobsRouter.get("/", getAllJobs);
 jobsRouter.get("/stats", getJobsStats);
 jobsRouter.get("/monthlyJobs/:year", getMonthlyJobs);
 jobsRouter.get("/:id", getOneJob);
-jobsRouter.patch("/:id", updateJob);
+jobsRouter.put("/:id", updateJob);
 jobsRouter.delete("/:id", deleteJob);
 
 export default jobsRouter;

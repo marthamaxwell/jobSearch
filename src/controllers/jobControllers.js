@@ -165,7 +165,7 @@ const getJobsStats = async (req, res) => {
       },
       {
         $group: {
-          _id: { $toUpper: "$postedDate" },
+          _id: { $toUpper: "$location" },
           numJobs: { $sum: 1 },
           avgSalary: { $avg: "$salary" },
           minSalary: { $min: "$salary" },
