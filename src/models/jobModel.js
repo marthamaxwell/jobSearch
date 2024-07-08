@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
 
 const jobSchema = mongoose.Schema(
   {
@@ -13,6 +14,11 @@ const jobSchema = mongoose.Schema(
     category: { type: String, required: true, trim: true },
     postedDate: { type: Date, default: Date.now },
     salary: { type: Number, default: 0, required: true },
+    slug: String,
+    // Image: { type: String },
+    // Tags: [{ type: String }],
+    // ApplicationLink: { type: String },
+    // Views: { type: Number, default: 0 },
     // User: {
     //   type: mongoose.Schema.Types.ObjectId,
     //   ref: "User",
@@ -28,6 +34,17 @@ const jobSchema = mongoose.Schema(
 
 jobSchema.virtual("annualSalary").get(function () {
   return this.salary * 12;
+});
+
+//DOCUMENT MIDDLEWARE
+jobSchema.pre("save", function (next) {
+  this.slug = slugify(this.title, { lowercase: true });
+  next();
+});
+
+jobSchema.post("save", function (doc, next) {
+  console.log(doc);
+  next();
 });
 
 const Job = mongoose.model("Job", jobSchema);
