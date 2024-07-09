@@ -5,7 +5,8 @@ import helmet from "helmet";
 import cors from "cors";
 import expressSanitizer from "express-sanitizer";
 import morgan from "morgan";
-
+import AppError from "./src/utilis/appError.js";
+import globalErrorHandler from "./src/controllers/errorController.js";
 import userRouter from "./src/routes/userRoutes.js";
 import jobsRouter from "./src/routes/jobsRoutes.js";
 
@@ -25,9 +26,13 @@ app.use(cors());
 app.use("/jobs", jobsRouter);
 app.use("/user", userRouter);
 
-app.get("/", (req, res) => {
-  res.send("hey puting more effort here");
+// Catch-all route handler for undefined routes
+app.all("*", (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
+
+// Global error-handling middleware
+app.use(globalErrorHandler);
 
 mongoose
   .connect(dataBase)
