@@ -2,9 +2,9 @@ import Job from "../models/jobModel.js";
 import User from "../models/userModel.js";
 import { ApiFeatures } from "../utilis/apiFeatures.js";
 import catchAsync from "../utilis/catchAsync.js";
-
+import AppError from "../utilis/appError.js";
 //create Job
-const createJob = catchAsync(async (req, res) => {
+const createJob = catchAsync(async (req, res, next) => {
   // if (!req.permission.job.create) {
   //   return res.status(401).json({
   //     message: "You're not allowed to create jobs",
@@ -45,7 +45,7 @@ const createJob = catchAsync(async (req, res) => {
 });
 
 //READ ALL JOBS
-const getAllJobs = catchAsync(async (req, res) => {
+const getAllJobs = catchAsync(async (req, res, next) => {
   // Create an instance of ApiFeatures to handle filtering, sorting, etc.
   const features = new ApiFeatures(Job.find(), req.query)
     .filter()
@@ -72,9 +72,13 @@ const getAllJobs = catchAsync(async (req, res) => {
 });
 
 //Read a single job
-const getOneJob = catchAsync(async (req, res) => {
+const getOneJob = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const singleJob = await Job.findById(id);
+  if (!singleJob) {
+    return next(new AppError("job not found", 404));
+  }
+
   res.status(201).json({
     success: true,
     message: "Job found",
@@ -83,7 +87,7 @@ const getOneJob = catchAsync(async (req, res) => {
 });
 
 //update a job
-const updateJob = catchAsync(async (req, res) => {
+const updateJob = catchAsync(async (req, res, next) => {
   // if (!req.permission.job.create) {
   //   return res.status(401).json({
   //     message: "You're not allowed to create jobs",
@@ -94,6 +98,11 @@ const updateJob = catchAsync(async (req, res) => {
     new: true,
     runValidators: true,
   });
+
+  if (!job) {
+    return next(new AppError("job not found", 404));
+  }
+
   // const updatedJob = job.findByIdAndUpdate(id)
   res.status(200).json({
     success: true,
@@ -103,7 +112,7 @@ const updateJob = catchAsync(async (req, res) => {
 });
 
 //delete a job
-const deleteJob = catchAsync(async (req, res) => {
+const deleteJob = catchAsync(async (req, res, next) => {
   // if (!req.permission.job.create) {
   //   return res.status(401).json({
   //     message: "You're not allowed to create jobs",
@@ -111,6 +120,10 @@ const deleteJob = catchAsync(async (req, res) => {
   // }
   const { id } = req.params;
   const deletedJob = await Job.findByIdAndDelete(id);
+  if (!deletedJob) {
+    return next(new AppError("job already deleted", 404));
+  }
+
   res.status(200).json({
     success: true,
     message: "job deleted succefully",
@@ -119,7 +132,7 @@ const deleteJob = catchAsync(async (req, res) => {
 });
 
 //Get Stats
-const getJobsStats = catchAsync(async (req, res) => {
+const getJobsStats = catchAsync(async (req, res, next) => {
   const stats = await Job.aggregate([
     {
       $match: { salary: { $gte: 50 } },
@@ -155,7 +168,7 @@ const getJobsStats = catchAsync(async (req, res) => {
 });
 
 //Get Monthly Job Statistics
-const getMonthlyJobs = catchAsync(async (req, res) => {
+const getMonthlyJobs = catchAsync(async (req, res, next) => {
   const year = req.params.year * 1;
 
   const monthlyJobs = await Job.aggregate([
