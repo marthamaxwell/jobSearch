@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import slugify from "slugify";
 
 const jobSchema = mongoose.Schema(
   {
@@ -37,10 +36,10 @@ jobSchema.virtual("annualSalary").get(function () {
 });
 
 //DOCUMENT MIDDLEWARE
-jobSchema.pre("save", function (next) {
-  this.slug = slugify(this.title, { lowercase: true });
-  next();
-});
+// jobSchema.pre("save", function (next) {
+//   this.slug = slugify(this.title, { lowercase: true });
+//   next();
+// });
 
 jobSchema.post("save", function (doc, next) {
   console.log(doc);

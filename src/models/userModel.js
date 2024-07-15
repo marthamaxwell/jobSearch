@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
-import bcryptjs from "bcryptjs";
+import bcrypt from "bcryptjs";
 
 const userSchema = mongoose.Schema({
   name: {
@@ -40,7 +40,7 @@ const userSchema = mongoose.Schema({
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  this.password = bcryptjs.hash(this.password, 12);
+  this.password = await bcrypt.hash(this.password, 12);
 
   this.passwordConfirmed = undefined;
   next();
