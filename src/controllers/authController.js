@@ -6,7 +6,13 @@ import catchAsync from "../utilis/catchAsync.js";
 
 //REGISTER USER
 const regUSer = catchAsync(async (req, res) => {
-  const registeredUser = await User.create(req.body);
+  const {name, email, password, passwordConfirmed} = req.body
+  const registeredUser = await User.create({
+    name,
+    email,
+    password,
+    passwordConfirmed,
+  });
 
   res.status(201).json({
     success: true,
