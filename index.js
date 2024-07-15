@@ -34,14 +34,21 @@ app.all("*", (req, res, next) => {
 // Global error-handling middleware
 app.use(globalErrorHandler);
 
-mongoose
-  .connect(dataBase)
-  .then(() => {
+mongoose.connect(dataBase).then(() => {
+  try {
     console.log("Database Connected");
     app.listen(myPort, () => {
       console.log(`server is running on ${myPort}`);
     });
-  })
-  .catch(() => {
+  } catch (err) {
     console.log("Database Not Connected");
-  });
+  }
+});
+
+// process.on("unhandledRejection", (err) => {
+//   console.log("UNHANDLED REJECTION! Shutting down...");
+//   console.log(err.name, err.message);
+//   server.close(() => {
+//     process.exit(1);
+//   });
+// });

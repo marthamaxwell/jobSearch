@@ -2,67 +2,18 @@ import validator from "validator";
 import User from "../models/userModel.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import catchAsync from "../utilis/catchAsync.js";
 
 //REGISTER USER
-const regUSer = async (req, res) => {
-  try {
-    const { fullName, email, password, gender, role, permissions, profile } =
-      req.body;
-    if (!fullName || !email || !password) {
-      res.send("input required fields");
-    }
+const regUSer = catchAsync(async (req, res) => {
+  const registeredUser = await User.create(req.body);
 
-    const existingEmail = await User.findOne({ email });
-    if (existingEmail) {
-      res.status(400).json({
-        message: `Email ${email} already in use`,
-      });
-    }
-
-    if (!validator.isStrongPassword(password)) {
-      res.status(400).json({
-        message: `Weak password: Your password must include lowercase, uppercase, digits, symbols and must be at least 8 characters`,
-      });
-    }
-    const salt = await bcryptjs.genSalt(10);
-    const hashedPassword = await bcryptjs.hash(password, salt);
-
-    const registeredUser = await User.create({
-      fullName,
-      email,
-      password: hashedPassword,
-      gender,
-      role,
-      profile,
-      permissions,
-    });
-
-    const token = jwt.sign(
-      {
-        _id: registeredUser.id,
-        email: registeredUser.email,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      }
-    );
-    registeredUser.auth.token = token;
-    await registeredUser.save();
-
-    res.status(201).json({
-      success: true,
-      message: "User created Successfully",
-      data: registeredUser,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "User not created",
-      error: error.message,
-    });
-  }
-};
+  res.status(201).json({
+    success: true,
+    message: "User created Successfully",
+    data: registeredUser,
+  });
+});
 
 //LOGIN USER
 const loginUser = async (req, res) => {

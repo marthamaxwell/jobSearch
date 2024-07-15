@@ -1,83 +1,50 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcryptjs from "bcryptjs";
 
-const userSchema = mongoose.Schema(
-  {
-    fullName: {
-      type: String,
-      trim: true,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      validate(value) {
-        if (!validator.isEmail(value)) {
-          throw new Error(`Invalid email address: ${value}`);
-        }
-      },
-    },
-    password: {
-      type: String,
-      trim: true,
-      required: true,
-      validate(value) {
-        if (!validator.isStrongPassword(value)) {
-          throw new Error(
-            `Weak password: ${value}. Your password must include lowercase, uppercase, digits, symbols and must be at least 8 characters`
-          );
-        }
-      },
-    },
+const userSchema = mongoose.Schema({
+  name: {
+    type: String,
+    trim: true,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: [true, "Email already in use... Provide another email"],
+    trim: true,
+    lowercase: true,
+    validate: [validator.isEmail, "Please provide a valid email address"],
+  },
 
-    gender: {
-      type: String,
-      enum: ["Male", "Female"],
-    },
+  photo: { type: String },
 
-    role: {
-      type: String,
-      enum: ["Admin", "JobScouter"],
-      default: "JobScouter",
-    },
+  password: {
+    type: String,
+    trim: true,
+    required: true,
+    minLength: 8,
+  },
 
-    permissions: {
-      job: {
-        create: {
-          type: Boolean,
-          default: false,
-        },
-        read: {
-          type: Boolean,
-          deafult: true,
-        },
-        update: {
-          type: Boolean,
-          deafult: false,
-        },
-        remove: {
-          type: Boolean,
-          deafult: false,
-        },
+  passwordConfirmed: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function (el) {
+        return el === this.password;
       },
-    },
-    profile: {
-      bio: {
-        type: String,
-      },
-      contactNumber: {
-        type: String,
-      },
+      message: "passwords do not match",
     },
   },
-  {
-    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  }
-);
+});
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = bcryptjs.hash(this.password, 12);
+
+  this.passwordConfirmed = undefined;
+  next();
+});
 
 const User = mongoose.model("User", userSchema);
 
