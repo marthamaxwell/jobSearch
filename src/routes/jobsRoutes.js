@@ -10,12 +10,13 @@ import {
   updateJob,
 } from "../controllers/jobControllers.js";
 import { aliasTopJobs } from "../middleware/aliasTopJobs.js";
+import { protect } from "../controllers/authController.js";
 
 const jobsRouter = express.Router();
 
 jobsRouter.post("/", createJob);
 jobsRouter.get("/top2", aliasTopJobs, getAllJobs);
-jobsRouter.get("/", getAllJobs);
+jobsRouter.get("/", protect, getAllJobs);
 jobsRouter.get("/stats", getJobsStats);
 jobsRouter.get("/monthlyJobs/:year", getMonthlyJobs);
 jobsRouter.get("/:id", getOneJob);

@@ -5,6 +5,11 @@ const handleCastErrorDb = (err) => {
   return new AppError(message, 400);
 };
 
+const handleJsonWebTokenError = () =>
+  new AppError("Invalid token. Please login again.", 401);
+const handleJwtTokenExpiredError = () =>
+  new AppError("Token expired. Please login again.", 401);
+
 const handleDuplicateFieldsdb = (err) => {
   const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
   const message = `Duplicate field value: ${value}`;
@@ -55,6 +60,9 @@ const globalErrorHandler = (err, req, res, next) => {
     if (error.code === 11000) error = handle = handleDuplicateFieldsdb(error);
     if (error.name === "ValidationError")
       error = handleValidationErrorDb(error);
+    if (error.name === "JsonWebTokenError") error = handleJsonWebTokenError();
+    if (error.name === "TokenExpiredError")
+      error = handleJwtTokenExpiredError();
     sendErrorProd(error, res);
   }
 };
